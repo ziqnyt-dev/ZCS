@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Cryptography.Z - Generator & Pembaca Kode 44 Karakter">
+  <title>Cryptography.Z</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg: #FAFAF8;
+      --bg-card: #FFFFFF;
+      --bg-input: #F5F5F3;
+      --text: #1a1a1a;
+      --text-secondary: #666666;
+      --border: #e0e0e0;
+      --yellow: #F5C518;
+      --yellow-light: #FFF9E0;
+      --black: #1a1a1a;
+      --error: #c62828;
+      --error-bg: #ffebee;
+      --success: #2e7d32;
+      --success-bg: #e8f5e9;
+      --radius: 10px;
+      --radius-sm: 6px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      padding: 2rem 1rem 1.5rem;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.25rem;
+      color: var(--black);
+    }
+
+    header .tagline {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+
+    header .subtitle {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 400;
+    }
+
+    header .desc {
+      color: var(--text-secondary);
+      font-size: 0.8125rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Mode Tabs */
+    .mode-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      background: var(--bg-card);
+      padding: 0.5rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      position: sticky;
+      top: 0.5rem;
+      z-index: 10;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .mode-tabs button {
+      flex: 1;
+      padding: 0.875rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .mode-tabs button:hover {
+      color: var(--text);
+      background: rgba(0,0,0,0.02);
+    }
+
+    .mode-tabs button.active {
+      background: var(--black);
+      color: white;
+    }
+
+    /* Sections */
+    section {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hidden { display: none !important; }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--yellow);
+      display: inline-block;
+    }
+
+    .card-subtitle {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      margin-top: -0.75rem;
+    }
+
+    /* Form Elements */
+    label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-family: 'SF Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+      background: var(--bg-input);
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--yellow);
+      background: var(--bg-card);
+      box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.15);
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    input[type="number"], select {
+      width: 100%;
+      min-height: 58px;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 1.05rem;
+      font-family: inherit;
+      background: var(--bg-input);
+      color: var(--text);
+    }
+    input[type="number"] {
+      font-family: 'SF Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-weight: 600;
+    }
+    input[readonly] { cursor: not-allowed; opacity: 0.9; }
+    .select-wrap { position: relative; }
+    .select-wrap select { appearance: none; padding-right: 2.5rem; }
+    .select-wrap::after { content: '▾'; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-secondary); }
+
+    .char-counter {
+      text-align: right;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.375rem;
+      font-weight: 500;
+    }
+
+    .char-counter.warning { color: var(--error); }
+    .char-counter.ok { color: var(--success); }
+
+    .timestamp-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: stretch;
+    }
+
+    .timestamp-row input { flex: 1; min-width: 0; }
+
+    .timestamp-help {
+      margin-top: 0.5rem;
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 639px) {
+      .timestamp-row { flex-direction: column; }
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--black);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #333;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: var(--bg-input);
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--yellow-light);
+      border-color: var(--yellow);
+    }
+
+    .btn-yellow {
+      background: var(--yellow);
+      color: var(--black);
+    }
+
+    .btn-yellow:hover {
+      background: #e5b500;
+      transform: translateY(-1px);
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .btn-group .btn {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    /* Radio Groups */
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.875rem;
+      padding: 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--bg-card);
+    }
+
+    .radio-option:hover {
+      border-color: #ccc;
+    }
+
+    .radio-option input[type="radio"] {
+      margin-top: 0.125rem;
+      width: 1.125rem;
+      height: 1.125rem;
+      accent-color: var(--black);
+      flex-shrink: 0;
+    }
+
+    .radio-option.selected {
+      border-color: var(--yellow);
+      background: var(--yellow-light);
+    }
+
+    .radio-label {
+      font-weight: 700;
+      font-size: 0.875rem;
+      color: var(--text);
+    }
+
+    .radio-desc {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+      font-family: 'SF Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+      word-break: break-all;
+    }
+
+    /* Code Display */
+    .code-display {
+      font-family: 'SF Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 0.9375rem;
+      word-break: break-all;
+      background: var(--bg-input);
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      overflow-x: auto;
+      white-space: nowrap;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .code-display::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .code-display::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    /* Result Grid */
+    .result-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .result-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    .result-label {
+      font-size: 0.6875rem;
+      color: var(--text-secondary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .result-value {
+      font-family: 'SF Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 0.9375rem;
+      color: var(--text);
+      word-break: break-all;
+    }
+
+    .result-value.large {
+      font-size: 1.125rem;
+      font-weight: 800;
+      background: var(--yellow-light);
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--yellow);
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+
+    /* Countdown */
+    .countdown-container {
+      margin-top: 0.75rem;
+    }
+
+    .countdown-text {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .countdown-bar {
+      width: 100%;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+
+    .countdown-fill {
+      height: 100%;
+      background: var(--yellow);
+      border-radius: 2px;
+      transition: width 1s linear;
+    }
+
+    /* Messages */
+    .msg {
+      font-size: 0.875rem;
+      margin-top: 0.75rem;
+      padding: 0.875rem 1rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      animation: slideIn 0.2s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-error {
+      color: var(--error);
+      background: var(--error-bg);
+      border-left: 3px solid var(--error);
+    }
+
+    .msg-success {
+      color: var(--success);
+      background: var(--success-bg);
+      border-left: 3px solid var(--success);
+    }
+
+    .msg-warning {
+      color: #856404;
+      background: #fff3cd;
+      border-left: 3px solid #ffc107;
+    }
+
+    /* QR Code */
+    .qr-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem;
+      background: white;
+      border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      margin-top: 1rem;
+    }
+
+    #qrcode {
+      display: flex;
+      justify-content: center;
+    }
+
+    #qrcode img, #qrcode canvas {
+      display: block;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Scanner Overlay */
+    .scanner-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      gap: 1rem;
+    }
+
+    .scanner-video {
+      width: 100%;
+      max-width: 420px;
+      max-height: 70vh;
+      border-radius: var(--radius);
+      object-fit: cover;
+    }
+
+    .scanner-instruction {
+      color: white;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .scanner-close {
+      background: white;
+      color: var(--black);
+      padding: 0.75rem 2rem;
+    }
+
+    .scanner-close:hover {
+      background: var(--yellow);
+    }
+
+    /* Input Methods */
+    .input-methods {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .input-method-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .input-method-btn:hover {
+      border-color: var(--yellow);
+      background: var(--yellow-light);
+      color: var(--text);
+    }
+
+    .input-method-btn svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    /* File Input Hidden */
+    .file-input-hidden {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.25rem 0;
+    }
+
+    /* Spacing utilities */
+    .mt-1 { margin-top: 0.5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .mt-3 { margin-top: 1.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .mb-2 { margin-bottom: 1rem; }
+
+    /* Responsive */
+    @media (min-width: 640px) {
+      .container { padding: 2rem; }
+      header h1 { font-size: 2.25rem; }
+      .result-grid { grid-template-columns: 1fr 1fr; }
+      .result-item.full-width { grid-column: 1 / -1; }
+      .input-methods { flex-direction: row; }
+      .input-method-btn { flex: 1; }
+    }
+
+    @media (min-width: 768px) {
+      .btn-group .btn { flex: 0 1 auto; }
+    }
+
+    /* Print */
+    @media print {
+      .mode-tabs, .btn, .input-methods, .scanner-overlay { display: none !important; }
+      .card { border: 1px solid #ccc; break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="tagline">Generate. Read. Rotate.</div>
+      <h1>Cryptography.Z</h1>
+      <p class="subtitle">Generator & Pembaca Kode 44 Karakter</p>
+      <p class="desc">Buat, baca, dan hitung kode dengan interval perubahan yang dapat disesuaikan.</p>
+    </header>
+
+    <nav class="mode-tabs" role="tablist" aria-label="Mode aplikasi">
+      <button id="tab-buat" class="active" role="tab" aria-selected="true" aria-controls="section-buat">BUAT KODE</button>
+      <button id="tab-baca" role="tab" aria-selected="false" aria-controls="section-baca">BACA KODE</button>
+    </nav>
+
+    <main>
+      <!-- ==================== BUAT KODE ==================== -->
+      <section id="section-buat" aria-labelledby="tab-buat">
+        <!-- Random 30 Character Code -->
+        <div class="card">
+          <h2 class="card-title">Kode 30 Karakter</h2>
+          <label for="input-30char">Kode Acak</label>
+          <input type="text" id="input-30char" maxlength="30" inputmode="text" autocomplete="off" placeholder="Tekan tombol untuk membuat kode acak" readonly>
+          <div class="char-counter" id="counter-30char">0 / 30 karakter</div>
+          <button class="btn btn-primary btn-block mt-2" id="btn-acak-30">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            Acak 30 Karakter
+          </button>
+        </div>
+
+        <!-- Character Order -->
+        <div class="card">
+          <h2 class="card-title">Kombinasi Karakter</h2>
+          <p class="card-subtitle">Pilih tepat satu dari 6 konfigurasi ZCS. Pilihan ini digunakan untuk Generate, Read / Verify, validasi, dan kode aktif.</p>
+          <div class="select-wrap">
+            <select id="select-order-buat" aria-label="Pilih kombinasi karakter">
+              <option value="order1">1 — 0–9 → a–z → A–Z</option>
+              <option value="order2">2 — 0–9 → A–Z → a–z</option>
+              <option value="order3">3 — a–z → 0–9 → A–Z</option>
+              <option value="order4">4 — a–z → A–Z → 0–9</option>
+              <option value="order5">5 — A–Z → 0–9 → a–z</option>
+              <option value="order6">6 — A–Z → a–z → 0–9</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Custom Rotation Interval -->
+        <div class="card">
+          <h2 class="card-title">Interval Kode</h2>
+          <label for="input-interval">Interval perubahan kode (detik)</label>
+          <input type="number" id="input-interval" min="1" max="86400" step="1" value="30" inputmode="numeric" autocomplete="off">
+          <div id="interval-help" class="card-subtitle timestamp-help">Masukkan jumlah detik sesuai kebutuhan — bisa puluhan, ratusan, atau ribuan detik. Contoh: 30, 60, 300, 1000.</div>
+        </div>
+
+        <!-- Timestamp -->
+        <div class="card">
+          <h2 class="card-title">Timestamp</h2>
+          <div class="radio-group" id="timestamp-mode">
+            <label class="radio-option selected" data-value="device">
+              <input type="radio" name="timestamp-mode" value="device" checked>
+              <div><div class="radio-label">Waktu Perangkat</div><div class="radio-desc">Gunakan tanggal dan waktu saat ini dari perangkat.</div></div>
+            </label>
+            <label class="radio-option" data-value="custom">
+              <input type="radio" name="timestamp-mode" value="custom">
+              <div><div class="radio-label">Custom</div><div class="radio-desc">Masukkan timestamp sendiri dalam format DDMMYYYYHHmmss.</div></div>
+            </label>
+          </div>
+          <label for="input-timestamp">Timestamp</label>
+          <div class="timestamp-row">
+            <input type="text" id="input-timestamp" maxlength="14" inputmode="numeric" autocomplete="off"
+                   placeholder="DDMMYYYYHHmmss" aria-describedby="timestamp-help" disabled>
+          </div>
+          <div class="char-counter" id="counter-timestamp">0 / 14 karakter</div>
+          <div id="timestamp-help" class="card-subtitle timestamp-help">Waktu Perangkat akan menggunakan waktu saat Generate ditekan. Pilih Custom untuk memasukkan timestamp secara manual.</div>
+        </div>
+
+        <!-- Generate Button -->
+        <button class="btn btn-primary btn-block" id="btn-generate">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          Generate Kode Lengkap
+        </button>
+
+        <!-- Result Section -->
+        <div id="result-section" class="hidden mt-3">
+          <div class="card">
+            <h2 class="card-title">Kode Lengkap</h2>
+            <div class="code-display" id="result-44char"></div>
+            <div class="char-counter ok" id="counter-44char">44 / 44 karakter</div>
+            <div class="result-item mt-2">
+              <span class="result-label">Selected Order</span>
+              <span class="result-value" id="result-order"></span>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-primary" id="btn-salin-kode">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                Salin Kode
+              </button>
+              <button class="btn btn-secondary" id="btn-generate-ulang">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                Generate Ulang
+              </button>
+              <button class="btn btn-secondary" id="btn-hapus">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                Hapus
+              </button>
+            </div>
+            <div id="msg-buat"></div>
+          </div>
+
+          <!-- QR Code -->
+          <div class="card">
+            <h2 class="card-title">QR Code</h2>
+            <div class="qr-container">
+              <div id="qrcode"></div>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-primary" id="btn-unduh-qr">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Unduh QR
+              </button>
+              <button class="btn btn-yellow" id="btn-bagikan">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                Simpan / Bagikan
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== BACA KODE ==================== -->
+      <section id="section-baca" class="hidden" aria-labelledby="tab-baca">
+        <!-- Character Order -->
+        <div class="card">
+          <h2 class="card-title">Kombinasi Karakter</h2>
+          <p class="card-subtitle">Pilih tepat satu dari 6 konfigurasi ZCS. Pilihan ini digunakan untuk Generate, Read / Verify, validasi, dan kode aktif.</p>
+          <div class="select-wrap">
+            <select id="select-order-baca" aria-label="Pilih kombinasi karakter">
+              <option value="order1">1 — 0–9 → a–z → A–Z</option>
+              <option value="order2">2 — 0–9 → A–Z → a–z</option>
+              <option value="order3">3 — a–z → 0–9 → A–Z</option>
+              <option value="order4">4 — a–z → A–Z → 0–9</option>
+              <option value="order5">5 — A–Z → 0–9 → a–z</option>
+              <option value="order6">6 — A–Z → a–z → 0–9</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Custom Rotation Interval -->
+        <div class="card">
+          <h2 class="card-title">Interval Kode</h2>
+          <label for="input-interval-baca">Interval perubahan kode (detik)</label>
+          <input type="number" id="input-interval-baca" min="1" max="86400" step="1" value="30" inputmode="numeric" autocomplete="off">
+          <div class="card-subtitle timestamp-help">Masukkan interval secara manual untuk pembacaan kode ini. Nilai ini berdiri sendiri dan tidak mengikuti halaman Buat Kode. Maksimal 86.400 detik.</div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="card">
+          <h2 class="card-title">Baca Kode</h2>
+          <label for="input-44char">Masukkan 44 karakter kode</label>
+          <textarea id="input-44char" maxlength="44" placeholder="Contoh: k8X9mP2qR7vW1zY4bN6tL3sJ5aD9mQ17081998103000"></textarea>
+          <div class="char-counter" id="counter-44char-input">0 / 44 karakter</div>
+
+          <div class="input-methods">
+            <button class="input-method-btn" id="btn-scan-qr">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect><rect x="7" y="14" width="3" height="3"></rect><rect x="14" y="14" width="3" height="3"></rect></svg>
+              Scan QR
+            </button>
+            <button class="input-method-btn" id="btn-pilih-galeri">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              Pilih QR dari Galeri
+            </button>
+            <input type="file" id="file-galeri" class="file-input-hidden" accept="image/png,image/jpeg,image/jpg,image/webp">
+          </div>
+
+          <button class="btn btn-primary btn-block mt-2" id="btn-baca-kode">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            Baca Kode
+          </button>
+          <div id="msg-baca"></div>
+        </div>
+
+        <!-- Calculation Result: detail panel removed for reduced information disclosure -->
+        <div id="baca-result" class="hidden">
+          <!-- Active Code -->
+          <div class="card">
+            <h2 class="card-title">Kode Yang Sedang Berlaku</h2>
+            <div class="result-value large" id="res-kode-aktif"></div>
+            <div class="countdown-container">
+              <div class="countdown-text" id="countdown-text">Kode berubah dalam 30 detik</div>
+              <div class="countdown-bar">
+                <div class="countdown-fill" id="countdown-fill" style="width: 100%"></div>
+              </div>
+            </div>
+            <button class="btn btn-yellow btn-block mt-2" id="btn-salin-aktif">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              Salin Kode Aktif
+            </button>
+            <div id="msg-aktif"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer style="text-align: center; padding: 2rem 1rem; color: var(--text-secondary); font-size: 0.75rem;">
+      Cryptography.Z &mdash; Utility Kode Deterministik
+    </footer>
+  </div>
+
+  <!-- Scanner Overlay -->
+  <div id="scanner-overlay" class="scanner-overlay hidden">
+    <div class="scanner-instruction">Arahkan kamera ke QR Code</div>
+    <video id="scanner-video" class="scanner-video" autoplay playsinline muted></video>
+    <canvas id="scanner-canvas" style="display: none;"></canvas>
+    <button class="btn scanner-close" id="btn-scanner-close">Tutup Scanner</button>
+  </div>
+
+  <script>
+    // ==================== CONSTANTS ====================
+    // EXACTLY 6 ZCS alphabet configurations.
+    const ALPHABETS = {
+      order1: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      order2: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+      order3: 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      order4: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+      order5: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz',
+      order6: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    };
+
+    const ORDER_LABELS = {
+      order1: 'ZCS ORDER 1 — 0-9 → a-z → A-Z',
+      order2: 'ZCS ORDER 2 — 0-9 → A-Z → a-z',
+      order3: 'ZCS ORDER 3 — a-z → 0-9 → A-Z',
+      order4: 'ZCS ORDER 4 — a-z → A-Z → 0-9',
+      order5: 'ZCS ORDER 5 — A-Z → 0-9 → a-z',
+      order6: 'ZCS ORDER 6 — A-Z → a-z → 0-9'
+    };
+
+    const ORDER_KEYS = ['order1', 'order2', 'order3', 'order4', 'order5', 'order6'];
+
+    const BASE = BigInt(62);
+    const MOD = BASE ** BigInt(30);
+
+    // ==================== STATE ====================
+    let state = {
+      generatedCode: '',
+      generatedTimestamp: '',
+      generatedOrder: 'order1',
+      selectedOrder: 'order1',
+      intervalSeconds: 30,
+      readCode: '',
+      readTimestamp: '',
+      readInitialCode: '',
+      readOrder: 'order1',
+      liveInterval: null,
+      lastInterval: null
+    };
+
+    let jsQRModule = null;
+    let scannerStream = null;
+    let scannerAnimationId = null;
+    let qrCodeObj = null;
+
+    // ==================== UTILITIES ====================
+    function $(id) { return document.getElementById(id); }
+
+    function showMsg(containerId, text, type = 'error') {
+      const container = $(containerId);
+      if (!container) return;
+      container.innerHTML = `<div class="msg msg-${type}">${escapeHtml(text)}</div>`;
+      if (type === 'success') {
+        setTimeout(() => { container.innerHTML = ''; }, 3000);
+      }
+    }
+
+    function clearMsg(containerId) {
+      const container = $(containerId);
+      if (container) container.innerHTML = '';
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatNumber(n) {
+      return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    // ==================== BASE-62 MATH ====================
+    function decodeBase62(str, alphabet) {
+      let result = BigInt(0);
+      for (let i = 0; i < str.length; i++) {
+        const idx = alphabet.indexOf(str[i]);
+        if (idx === -1) throw new Error('Karakter tidak valid: ' + str[i]);
+        result = result * BASE + BigInt(idx);
+      }
+      return result;
+    }
+
+    function encodeBase62(num, alphabet) {
+      if (num === BigInt(0)) {
+        return alphabet[0].repeat(30);
+      }
+      let n = ((num % MOD) + MOD) % MOD;
+      let result = '';
+      while (n > BigInt(0)) {
+        const rem = Number(n % BASE);
+        result = alphabet[rem] + result;
+        n = n / BASE;
+      }
+      return alphabet[0].repeat(30 - result.length) + result;
+    }
+
+    function calculateCurrentCounter(initialCode, timestampStr, alphabet, intervalSeconds = state.intervalSeconds) {
+      const interval = Number(intervalSeconds);
+      if (!Number.isInteger(interval) || interval < 1 || interval > 86400) {
+        throw new Error('Interval harus berupa bilangan bulat 1–86400 detik.');
+      }
+
+      const initialPosition = decodeBase62(initialCode, alphabet);
+      const initialDate = parseTimestamp(timestampStr);
+      const now = new Date();
+      const elapsedMs = now.getTime() - initialDate.getTime();
+      const elapsedSeconds = Math.floor(elapsedMs / 1000);
+
+      if (elapsedSeconds < 0) {
+        throw new Error('Timestamp berada di masa depan.');
+      }
+
+      const intervals = BigInt(Math.floor(elapsedSeconds / interval));
+      const currentPosition = (initialPosition + intervals) % MOD;
+      const remainder = elapsedSeconds % interval;
+      return {
+        code: encodeBase62(currentPosition, alphabet),
+        elapsedSeconds,
+        intervals: Number(intervals),
+        intervalSeconds: interval,
+        secondsUntilNext: remainder === 0 ? interval : interval - remainder,
+        initialDate,
+        now
+      };
+    }
+
+    // ==================== TIMESTAMP ====================
+
+    function generateLocalTimestamp() {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${pad(now.getDate())}${pad(now.getMonth() + 1)}${now.getFullYear()}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    }
+
+    function validateTimestamp(ts) {
+      if (!/^\d{14}$/.test(ts)) return false;
+      const day = parseInt(ts.slice(0, 2), 10);
+      const month = parseInt(ts.slice(2, 4), 10);
+      const year = parseInt(ts.slice(4, 8), 10);
+      const hour = parseInt(ts.slice(8, 10), 10);
+      const minute = parseInt(ts.slice(10, 12), 10);
+      const second = parseInt(ts.slice(12, 14), 10);
+
+      if (month < 1 || month > 12) return false;
+      if (hour > 23 || minute > 59 || second > 59) return false;
+
+      const date = new Date(year, month - 1, day, hour, minute, second);
+      return date.getFullYear() === year &&
+             date.getMonth() === month - 1 &&
+             date.getDate() === day &&
+             date.getHours() === hour &&
+             date.getMinutes() === minute &&
+             date.getSeconds() === second;
+    }
+
+    function parseTimestamp(ts) {
+      const day = parseInt(ts.slice(0, 2), 10);
+      const month = parseInt(ts.slice(2, 4), 10) - 1;
+      const year = parseInt(ts.slice(4, 8), 10);
+      const hour = parseInt(ts.slice(8, 10), 10);
+      const minute = parseInt(ts.slice(10, 12), 10);
+      const second = parseInt(ts.slice(12, 14), 10);
+      return new Date(year, month, day, hour, minute, second);
+    }
+
+    function formatDateTime(date) {
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    }
+
+    // ==================== RANDOM GENERATION ====================
+    function generateRandom30Characters(alphabet) {
+      // CSPRNG + rejection sampling agar setiap karakter Base-62 punya
+      // peluang yang seragam (tidak ada bias dari byte % 62).
+      const result = [];
+      const limit = 256 - (256 % 62); // 248
+      while (result.length < 30) {
+        const bytes = new Uint8Array(32);
+        crypto.getRandomValues(bytes);
+        for (const byte of bytes) {
+          if (byte >= limit) continue;
+          result.push(alphabet[byte % 62]);
+          if (result.length === 30) break;
+        }
+      }
+      return result.join('');
+    }
+
+    // ==================== VALIDATION ====================
+    function validate44CharacterCode(code) {
+      if (code.length !== 44) {
+        return { valid: false, error: 'Kode harus terdiri dari tepat 44 karakter.' };
+      }
+      const code30 = code.slice(0, 30);
+      const ts14 = code.slice(30, 44);
+
+      if (!/^[0-9a-zA-Z]{30}$/.test(code30)) {
+        return { valid: false, error: '30 karakter pertama hanya boleh berisi angka dan huruf.' };
+      }
+      if (!/^\d{14}$/.test(ts14)) {
+        return { valid: false, error: '14 karakter terakhir harus berupa timestamp.' };
+      }
+      if (!validateTimestamp(ts14)) {
+        return { valid: false, error: 'Timestamp tidak valid.' };
+      }
+      return { valid: true };
+    }
+
+    // ==================== QR CODE ====================
+    function generateQRCode(text) {
+      const container = $('qrcode');
+      container.innerHTML = '';
+
+      const tempDiv = document.createElement('div');
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      document.body.appendChild(tempDiv);
+
+      try {
+        const qrSize = 260;
+        new QRCode(tempDiv, {
+          text: text,
+          width: qrSize,
+          height: qrSize,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+
+        const qrCanvas = tempDiv.querySelector('canvas');
+        if (!qrCanvas) {
+          document.body.removeChild(tempDiv);
+          return;
+        }
+
+        const qrCtx = qrCanvas.getContext('2d');
+        const qrData = qrCtx.getImageData(0, 0, qrSize, qrSize);
+
+        let minX = qrSize, minY = qrSize, maxX = 0, maxY = 0;
+        for (let y = 0; y < qrSize; y++) {
+          for (let x = 0; x < qrSize; x++) {
+            const idx = (y * qrSize + x) * 4;
+            if (qrData.data[idx] < 128) {
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
+              if (y < minY) minY = y;
+              if (y > maxY) maxY = y;
+            }
+          }
+        }
+
+        const contentW = maxX - minX + 1;
+        const contentH = maxY - minY + 1;
+        const contentSize = Math.max(contentW, contentH);
+        const padding = Math.round(contentSize * 0.06);
+        const totalSize = contentSize + padding * 2;
+
+        const styledCanvas = document.createElement('canvas');
+        styledCanvas.width = totalSize;
+        styledCanvas.height = totalSize;
+        const ctx = styledCanvas.getContext('2d');
+
+        const styledImageData = new ImageData(totalSize, totalSize);
+        for (let i = 0; i < styledImageData.data.length; i += 4) {
+          styledImageData.data[i] = 0x1A;
+          styledImageData.data[i + 1] = 0x1A;
+          styledImageData.data[i + 2] = 0x1A;
+          styledImageData.data[i + 3] = 255;
+        }
+
+        for (let y = 0; y < contentH; y++) {
+          for (let x = 0; x < contentW; x++) {
+            const srcIdx = ((y + minY) * qrSize + (x + minX)) * 4;
+            if (qrData.data[srcIdx] < 128) {
+              const dstIdx = ((y + padding) * totalSize + (x + padding)) * 4;
+              styledImageData.data[dstIdx] = 0xFF;
+              styledImageData.data[dstIdx + 1] = 0xD7;
+              styledImageData.data[dstIdx + 2] = 0x00;
+            }
+          }
+        }
+
+        ctx.putImageData(styledImageData, 0, 0);
+        container.appendChild(styledCanvas);
+
+      } catch (e) {
+        console.error('QR generation error:', e);
+      } finally {
+        if (tempDiv.parentNode) {
+          document.body.removeChild(tempDiv);
+        }
+      }
+    }
+
+    function getQRDataUrl() {
+      const container = $('qrcode');
+      const canvas = container.querySelector('canvas');
+      if (canvas) {
+        return canvas.toDataURL('image/png');
+      }
+      return null;
+    }
+
+    function downloadQRCode() {
+      const dataUrl = getQRDataUrl();
+      if (!dataUrl) {
+        showMsg('msg-buat', 'QR Code belum dibuat.', 'error');
+        return;
+      }
+      const link = document.createElement('a');
+      const ts = state.generatedTimestamp || 'unknown';
+      link.download = `CryptographyZ_${ts}.png`;
+      link.href = dataUrl;
+      link.click();
+    }
+
+    async function shareQRCode() {
+      const dataUrl = getQRDataUrl();
+      if (!dataUrl) {
+        showMsg('msg-buat', 'QR Code belum dibuat.', 'error');
+        return;
+      }
+      try {
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const file = new File([blob], `CryptographyZ_${state.generatedTimestamp || 'unknown'}.png`, { type: 'image/png' });
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Cryptography.Z QR Code'
+          });
+        } else {
+          showMsg('msg-buat', 'Bagikan tidak didukung di perangkat ini. Gunakan tombol Unduh.', 'error');
+        }
+      } catch (e) {
+        showMsg('msg-buat', 'Gagal membagikan. Gunakan tombol Unduh.', 'error');
+      }
+    }
+
+    // ==================== QR SCANNING ====================
+    async function loadJsQR() {
+      if (jsQRModule) return jsQRModule;
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+        script.onload = () => {
+          jsQRModule = window.jsQR;
+          resolve(jsQRModule);
+        };
+        script.onerror = () => reject(new Error('Gagal memuat library QR scanner.'));
+        document.head.appendChild(script);
+      });
+    }
+
+    async function startCameraScanner() {
+      try {
+        await loadJsQR();
+        const overlay = $('scanner-overlay');
+        const video = $('scanner-video');
+        const canvas = $('scanner-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+        overlay.classList.remove('hidden');
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+        scannerStream = stream;
+        video.srcObject = stream;
+        await video.play();
+
+        function scanFrame() {
+          if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQRModule(imageData.data, imageData.width, imageData.height, {
+              inversionAttempts: 'attemptBoth'
+            });
+            if (code && code.data) {
+              stopCameraScanner();
+              handleScannedCode(code.data);
+              return;
+            }
+          }
+          scannerAnimationId = requestAnimationFrame(scanFrame);
+        }
+        scanFrame();
+      } catch (err) {
+        stopCameraScanner();
+        showMsg('msg-baca', 'Kamera tidak dapat diakses. Pastikan izin kamera diberikan dan perangkat mendukung kamera.', 'error');
+      }
+    }
+
+    function stopCameraScanner() {
+      if (scannerStream) {
+        scannerStream.getTracks().forEach(track => track.stop());
+        scannerStream = null;
+      }
+      if (scannerAnimationId) {
+        cancelAnimationFrame(scannerAnimationId);
+        scannerAnimationId = null;
+      }
+      const overlay = $('scanner-overlay');
+      if (overlay) overlay.classList.add('hidden');
+    }
+
+    async function decodeQRFromImage(file) {
+      await loadJsQR();
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      const img = new Image();
+
+      return new Promise((resolve, reject) => {
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQRModule(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: 'attemptBoth'
+          });
+          if (code && code.data) {
+            resolve(code.data);
+          } else {
+            reject(new Error('QR tidak ditemukan dalam gambar.'));
+          }
+        };
+        img.onerror = () => reject(new Error('Gagal memuat gambar.'));
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    function handleScannedCode(data) {
+      const clean = data.trim();
+      $('input-44char').value = clean;
+      $('counter-44char-input').textContent = `${clean.length} / 44 karakter`;
+      const validation = validate44CharacterCode(clean);
+      if (validation.valid) {
+        processReadCode(clean);
+      } else {
+        showMsg('msg-baca', validation.error, 'error');
+      }
+    }
+
+    // ==================== CLIPBOARD ====================
+    async function copyToClipboard(text, msgContainerId) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showMsg(msgContainerId, 'Kode berhasil disalin.', 'success');
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showMsg(msgContainerId, 'Kode berhasil disalin.', 'success');
+        } catch (err) {
+          showMsg(msgContainerId, 'Gagal menyalin ke clipboard.', 'error');
+        }
+        document.body.removeChild(ta);
+      }
+    }
+
+    // ==================== UI LOGIC: BUAT KODE ====================
+    function getSelectedOrder(mode = 'buat') {
+      const select = mode === 'baca' ? $('select-order-baca') : $('select-order-buat');
+      return select && ALPHABETS[select.value] ? select.value : 'order1';
+    }
+
+    function setSelectedOrder(order, mode = 'buat') {
+      if (!ALPHABETS[order]) order = 'order1';
+      const select = mode === 'baca' ? $('select-order-baca') : $('select-order-buat');
+      if (select) select.value = order;
+      state.selectedOrder = order;
+      return order;
+    }
+
+    $('btn-acak-30').addEventListener('click', () => {
+      const order = setSelectedOrder(getSelectedOrder('buat'), 'buat');
+      const alphabet = ALPHABETS[order];
+      const code = generateRandom30Characters(alphabet);
+      $('input-30char').value = code;
+      $('counter-30char').textContent = `${code.length} / 30 karakter`;
+      clearMsg('msg-buat');
+    });
+
+    $('select-order-buat').addEventListener('change', () => {
+      setSelectedOrder($('select-order-buat').value, 'buat');
+      clearMsg('msg-buat');
+    });
+
+    $('select-order-baca').addEventListener('change', () => {
+      setSelectedOrder($('select-order-baca').value, 'baca');
+      clearMsg('msg-baca');
+    });
+
+    function getTimestampMode() {
+      const radio = document.querySelector('input[name="timestamp-mode"]:checked');
+      return radio ? radio.value : 'device';
+    }
+
+    function updateTimestampMode(mode) {
+      const input = $('input-timestamp');
+      const options = document.querySelectorAll('#timestamp-mode .radio-option');
+      options.forEach(opt => {
+        opt.classList.toggle('selected', opt.dataset.value === mode);
+        opt.querySelector('input').checked = opt.dataset.value === mode;
+      });
+
+      if (mode === 'device') {
+        input.disabled = true;
+        const timestamp = generateLocalTimestamp();
+        input.value = timestamp;
+        $('counter-timestamp').textContent = '14 / 14 karakter';
+        $('counter-timestamp').className = 'char-counter ok';
+      } else {
+        input.disabled = false;
+        $('counter-timestamp').textContent = `${input.value.length} / 14 karakter`;
+        $('counter-timestamp').className = 'char-counter' + (input.value.length === 14 ? ' ok' : '');
+        input.focus();
+      }
+      clearMsg('msg-buat');
+    }
+
+    document.querySelectorAll('#timestamp-mode .radio-option').forEach(opt => {
+      opt.addEventListener('click', () => updateTimestampMode(opt.dataset.value));
+    });
+
+    $('input-timestamp').addEventListener('input', (e) => {
+      const clean = e.target.value.replace(/\D/g, '').slice(0, 14);
+      if (e.target.value !== clean) e.target.value = clean;
+      $('counter-timestamp').textContent = `${clean.length} / 14 karakter`;
+      $('counter-timestamp').className = 'char-counter' + (clean.length === 14 ? ' ok' : '');
+      clearMsg('msg-buat');
+    });
+
+    function getSelectedInterval() {
+      const value = Number($('input-interval').value);
+      if (!Number.isInteger(value) || value < 1 || value > 86400) {
+        throw new Error('Interval harus berupa bilangan bulat 1–86400 detik.');
+      }
+      return value;
+    }
+
+    function getReadInterval() {
+      const value = Number($('input-interval-baca').value);
+      if (!Number.isInteger(value) || value < 1 || value > 86400) {
+        throw new Error('Interval baca harus berupa bilangan bulat 1–86400 detik.');
+      }
+      return value;
+    }
+
+    $('btn-generate').addEventListener('click', () => {
+      clearMsg('msg-buat');
+
+      const code30 = $('input-30char').value.trim();
+      if (code30.length !== 30) {
+        showMsg('msg-buat', 'Kode awal harus terdiri tepat dari 30 karakter.', 'error');
+        return;
+      }
+
+      const order = setSelectedOrder(getSelectedOrder('buat'), 'buat');
+      const alphabet = ALPHABETS[order];
+
+      for (const c of code30) {
+        if (!alphabet.includes(c)) {
+          showMsg('msg-buat', `Kode mengandung karakter tidak valid untuk ${ORDER_LABELS[order]}.`, 'error');
+          return;
+        }
+      }
+
+      let interval;
+      try {
+        interval = getSelectedInterval();
+      } catch (err) {
+        showMsg('msg-buat', err.message, 'error');
+        return;
+      }
+      const timestampMode = getTimestampMode();
+      let timestamp;
+      if (timestampMode === 'device') {
+        timestamp = generateLocalTimestamp();
+        $('input-timestamp').value = timestamp;
+        $('counter-timestamp').textContent = '14 / 14 karakter';
+        $('counter-timestamp').className = 'char-counter ok';
+      } else {
+        timestamp = $('input-timestamp').value.trim();
+      }
+      if (!/^\d{14}$/.test(timestamp)) {
+        showMsg('msg-buat', 'Timestamp harus tepat 14 angka dengan format DDMMYYYYHHmmss.', 'error');
+        return;
+      }
+      if (!validateTimestamp(timestamp)) {
+        showMsg('msg-buat', 'Timestamp tidak valid. Pastikan tanggal dan waktu benar.', 'error');
+        return;
+      }
+
+      const fullCode = code30 + timestamp;
+      if (fullCode.length !== 44) {
+        showMsg('msg-buat', 'Kode final harus tepat 44 karakter.', 'error');
+        return;
+      }
+
+      state.generatedCode = code30;
+      state.generatedTimestamp = timestamp;
+      state.generatedOrder = order;
+      state.selectedOrder = order;
+      state.intervalSeconds = interval;
+
+      $('result-44char').textContent = fullCode;
+      $('counter-44char').textContent = '44 / 44 karakter';
+      $('result-order').textContent = ORDER_LABELS[order];
+      $('result-section').classList.remove('hidden');
+
+      setTimeout(() => generateQRCode(fullCode), 50);
+      $('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    $('btn-salin-kode').addEventListener('click', () => {
+      const code = $('result-44char').textContent;
+      if (code) copyToClipboard(code, 'msg-buat');
+    });
+
+    $('btn-generate-ulang').addEventListener('click', () => {
+      const order = setSelectedOrder(getSelectedOrder('buat'), 'buat');
+      const alphabet = ALPHABETS[order];
+      const code = generateRandom30Characters(alphabet);
+      $('input-30char').value = code;
+      $('counter-30char').textContent = '30 / 30 karakter';
+      $('btn-generate').click();
+    });
+
+    $('btn-hapus').addEventListener('click', () => {
+      $('input-30char').value = '';
+      $('counter-30char').textContent = '0 / 30 karakter';
+      $('input-timestamp').value = '';
+      $('counter-timestamp').textContent = '0 / 14 karakter';
+      $('result-44char').textContent = '';
+      $('qrcode').innerHTML = '';
+      $('result-section').classList.add('hidden');
+      clearMsg('msg-buat');
+      state.generatedCode = '';
+      state.generatedTimestamp = '';
+    });
+
+    $('btn-unduh-qr').addEventListener('click', downloadQRCode);
+    $('btn-bagikan').addEventListener('click', shareQRCode);
+
+    // ==================== UI LOGIC: BACA KODE ====================
+    // Pengaturan Baca Kode berdiri sendiri dari halaman Buat Kode.
+
+    $('input-interval-baca').addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 5);
+      clearMsg('msg-baca');
+    });
+
+    $('input-interval').addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 5);
+      clearMsg('msg-buat');
+    });
+
+    $('input-44char').addEventListener('input', (e) => {
+      const len = e.target.value.length;
+      const counter = $('counter-44char-input');
+      counter.textContent = `${len} / 44 karakter`;
+      counter.className = 'char-counter' + (len === 44 ? ' ok' : '');
+      clearMsg('msg-baca');
+    });
+
+    $('btn-baca-kode').addEventListener('click', () => {
+      clearMsg('msg-baca');
+      const code = $('input-44char').value.trim();
+      const validation = validate44CharacterCode(code);
+      if (!validation.valid) {
+        showMsg('msg-baca', validation.error, 'error');
+        return;
+      }
+      processReadCode(code);
+    });
+
+    $('btn-scan-qr').addEventListener('click', startCameraScanner);
+    $('btn-scanner-close').addEventListener('click', stopCameraScanner);
+
+    $('btn-pilih-galeri').addEventListener('click', () => {
+      $('file-galeri').click();
+    });
+
+    $('file-galeri').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      clearMsg('msg-baca');
+      try {
+        const data = await decodeQRFromImage(file);
+        handleScannedCode(data);
+      } catch (err) {
+        showMsg('msg-baca', 'QR tidak dapat dibaca. Pastikan gambar berisi QR Cryptography.Z yang valid.', 'error');
+      }
+      $('file-galeri').value = '';
+    });
+
+    function processReadCode(code) {
+      const validation = validate44CharacterCode(code);
+      if (!validation.valid) {
+        showMsg('msg-baca', validation.error, 'error');
+        return;
+      }
+
+      const order = setSelectedOrder(getSelectedOrder('baca'), 'baca');
+      const alphabet = ALPHABETS[order];
+      let interval;
+      try {
+        interval = getReadInterval();
+      } catch (err) {
+        showMsg('msg-baca', err.message, 'error');
+        return;
+      }
+      const initialCode = code.slice(0, 30);
+      const timestamp = code.slice(30, 44);
+
+      state.readCode = code;
+      state.readInitialCode = initialCode;
+      state.readTimestamp = timestamp;
+      state.readOrder = order;
+
+      try {
+        const result = calculateCurrentCounter(initialCode, timestamp, alphabet, interval);
+        displayReadResult(result, initialCode, timestamp, order);
+        startLiveUpdate(initialCode, timestamp, order, interval);
+      } catch (err) {
+        showMsg('msg-baca', err.message, 'error');
+      }
+    }
+
+    function displayReadResult(result, initialCode, timestamp, order) {
+      $('res-kode-awal')?.replaceChildren(document.createTextNode(initialCode));
+      $('res-timestamp-awal')?.replaceChildren(document.createTextNode(timestamp));
+      $('res-waktu-awal')?.replaceChildren(document.createTextNode(formatDateTime(result.initialDate)));
+      $('res-waktu-sekarang')?.replaceChildren(document.createTextNode(formatDateTime(result.now)));
+      $('res-selisih')?.replaceChildren(document.createTextNode(`${formatNumber(result.elapsedSeconds)} detik`));
+      $('res-interval')?.replaceChildren(document.createTextNode(`${formatNumber(result.intervals)} × ${result.intervalSeconds} detik`));
+      $('res-urutan')?.replaceChildren(document.createTextNode(ORDER_LABELS[order]));
+      $('res-status')?.replaceChildren(document.createTextNode('VALID — perhitungan aktif menggunakan selected order'));
+      $('res-kode-aktif').textContent = result.code;
+      $('baca-result').classList.remove('hidden');
+      $('baca-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function startLiveUpdate(initialCode, timestamp, order, intervalSeconds = state.intervalSeconds) {
+      if (state.liveInterval) clearInterval(state.liveInterval);
+      state.lastInterval = null;
+
+      function tick() {
+        try {
+          const alphabet = ALPHABETS[order];
+          const result = calculateCurrentCounter(initialCode, timestamp, alphabet, intervalSeconds);
+
+          if (state.lastInterval === null || result.intervals !== state.lastInterval) {
+            state.lastInterval = result.intervals;
+            $('res-kode-aktif').textContent = result.code;
+            $('res-waktu-sekarang')?.replaceChildren(document.createTextNode(formatDateTime(result.now)));
+            $('res-selisih')?.replaceChildren(document.createTextNode(`${formatNumber(result.elapsedSeconds)} detik`));
+            $('res-interval')?.replaceChildren(document.createTextNode(`${formatNumber(result.intervals)} × ${result.intervalSeconds} detik`));
+          }
+
+          const countdownText = $('countdown-text');
+          const countdownFill = $('countdown-fill');
+          if (countdownText && countdownFill) {
+            countdownText.textContent = `Kode berubah dalam ${result.secondsUntilNext} detik`;
+            const pct = (result.secondsUntilNext / result.intervalSeconds) * 100;
+            countdownFill.style.width = `${pct}%`;
+          }
+        } catch (e) {
+          clearInterval(state.liveInterval);
+          state.liveInterval = null;
+        }
+      }
+
+      tick();
+      state.liveInterval = setInterval(tick, 1000);
+    }
+
+    $('btn-salin-aktif').addEventListener('click', () => {
+      const code = $('res-kode-aktif').textContent;
+      if (code) copyToClipboard(code, 'msg-aktif');
+    });
+
+    // ==================== MODE SWITCHING ====================
+    function switchMode(mode) {
+      const tabBuat = $('tab-buat');
+      const tabBaca = $('tab-baca');
+      const secBuat = $('section-buat');
+      const secBaca = $('section-baca');
+
+      if (mode === 'buat') {
+        tabBuat.classList.add('active');
+        tabBuat.setAttribute('aria-selected', 'true');
+        tabBaca.classList.remove('active');
+        tabBaca.setAttribute('aria-selected', 'false');
+        secBuat.classList.remove('hidden');
+        secBaca.classList.add('hidden');
+      } else {
+        tabBaca.classList.add('active');
+        tabBaca.setAttribute('aria-selected', 'true');
+        tabBuat.classList.remove('active');
+        tabBuat.setAttribute('aria-selected', 'false');
+        secBaca.classList.remove('hidden');
+        secBuat.classList.add('hidden');
+      }
+    }
+
+    $('tab-buat').addEventListener('click', () => switchMode('buat'));
+    $('tab-baca').addEventListener('click', () => switchMode('baca'));
+
+    // ==================== KEYBOARD SHORTCUTS ====================
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        stopCameraScanner();
+      }
+    });
+
+    // ==================== INIT ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      setSelectedOrder('order1', 'buat');
+      setSelectedOrder('order1', 'baca');
+      const alphabet = ALPHABETS.order1;
+      const code = generateRandom30Characters(alphabet);
+      $('input-30char').value = code;
+      $('counter-30char').textContent = '30 / 30 karakter';
+      updateTimestampMode('device');
+    });
+
+    // Cleanup on page hide/visibility change
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && scannerStream) {
+        stopCameraScanner();
+      }
+    });
+
+    window.addEventListener('beforeunload', () => {
+      if (state.liveInterval) clearInterval(state.liveInterval);
+      stopCameraScanner();
+    });
+  </script>
+</body>
+</html>
+  
